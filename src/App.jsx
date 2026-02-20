@@ -21,7 +21,9 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
         const data = await invoke("get_user_data");
+        console.log("Yüklenen veriler:", data);
         if (data && typeof data === "object") {
           setUserData({
             schedule: data.schedule || {},
@@ -31,13 +33,24 @@ function App() {
         }
       } catch (err) {
         console.error("Veri yükleme hatası:", err);
+        alert("Veriler yüklenirken bir hata oluştu. Lütfen uygulamayı yeniden başlatın.");
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  const save = (d) => invoke("save_user_data", { data: d }).catch(console.error);
+  const save = (d) => {
+    // Boş veri koruması: Eğer schedule ve exams ikisi birden boşsa kaydetme (hata olasılığına karşı)
+    if (!d || (Object.keys(d.schedule || {}).length === 0 && (d.exams || []).length === 0)) {
+      console.warn("Boş veri kaydedilmesi engellendi!");
+      return Promise.resolve();
+    }
+    return invoke("save_user_data", { data: d }).catch(err => {
+      console.error("Kaydetme hatası:", err);
+      throw err;
+    });
+  };
 
   const onSelectDay = (day) => {
     setSelectedDay(day);
@@ -45,12 +58,14 @@ function App() {
   };
 
   const updateTask = (index, field, value) => {
-    const newSchedule = { ...userData.schedule };
+    const newSchedule = { ...(userData.schedule || {}) };
     const dayTasks = [...(newSchedule[selectedDay] || [])];
     if (field === "DELETE") {
       dayTasks.splice(index, 1);
     } else {
-      dayTasks[index] = { ...dayTasks[index], [field]: value };
+      if (dayTasks[index]) {
+        dayTasks[index] = { ...dayTasks[index], [field]: value };
+      }
     }
     newSchedule[selectedDay] = dayTasks;
     const newData = { ...userData, schedule: newSchedule };
@@ -59,7 +74,7 @@ function App() {
   };
 
   const addTask = () => {
-    const newSchedule = { ...userData.schedule };
+    const newSchedule = { ...(userData.schedule || {}) };
     const dayTasks = [...(newSchedule[selectedDay] || [])];
     dayTasks.push({ title: "Yeni Ders", topic: "", questions: 0, note: "", completed: false });
     newSchedule[selectedDay] = dayTasks;
@@ -71,9 +86,9 @@ function App() {
   const applyTemplate = () => {
     const dayOfWeek = (new Date(selectedDay).getDay() + 6) % 7 + 1;
     const normalizedDay = dayOfWeek === 7 ? "0" : dayOfWeek.toString();
-    const template = userData.templates[normalizedDay] || [];
+    const template = (userData.templates || {})[normalizedDay] || [];
     if (template.length > 0) {
-      const newSchedule = { ...userData.schedule };
+      const newSchedule = { ...(userData.schedule || {}) };
       newSchedule[selectedDay] = template.map((t) => ({
         ...t,
         completed: false,
@@ -197,8 +212,16 @@ function App() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-[#0d121f] flex flex-col items-center justify-center gap-6 animate-pulse">
-        <div className="text-6xl">🎯</div>
+      <div className="h-screen bg-[#0d121f] flex flex-col items-center justify-center gap-6">
+        <div className="relative w-16 h-16 flex items-center justify-center animate-pulse">
+          <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl"></div>
+          <svg viewBox="0 0 24 24" className="w-14 h-14 relative z-10 drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="#3b82f6" strokeWidth="2.5" opacity="0.3" />
+            <circle cx="12" cy="12" r="5" stroke="#3b82f6" strokeWidth="2.5" />
+            <circle cx="12" cy="12" r="1.5" fill="white" />
+            <path d="M12 2V5M12 19V22M2 12H5M19 12H22" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+          </svg>
+        </div>
         <div className="text-xs font-black tracking-[0.8em] text-slate-700 uppercase">
           FOCUS YÜKLENİYOR...
         </div>
@@ -207,7 +230,7 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#020617] rounded-[20px] border border-white/10 shadow-4xl select-none font-sans m-2">
+    <div className="flex flex-col h-screen overflow-hidden bg-dark-navy rounded-[20px] border border-white/10 shadow-4xl select-none font-sans m-2">
       <TitleBar onOpenSettings={() => setIsSettingsOpen(true)} />
 
       <main className="flex-1 flex flex-col items-center justify-center p-4 xl:p-8 overflow-hidden relative">

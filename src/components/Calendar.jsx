@@ -86,11 +86,11 @@ const Calendar = ({ schedule, selectedDay, onSelectDay }) => {
                             onClick={() => !d.inactive && onSelectDay(dateStr)}
                             className={`
                 relative h-20 sm:h-24 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 group
-                ${d.inactive ? "opacity-5 pointer-events-none" : "hover:bg-white/10"}
+                ${d.inactive ? "opacity-5 pointer-events-none" : "hover:bg-white/10 hover:z-20"}
                 ${isToday ? "bg-duo-blue text-white z-10" : ""}
                 ${active ? "border-2 border-duo-blue z-20" : ""}
                 ${!isToday && !isFuture && dayTasks.length > 0 ? (completedCount === dayTasks.length ? "bg-duo-green/10" : "bg-duo-orange/10") : ""}
-                ${!isToday && isFuture && dayTasks.length > 0 ? "bg-white/[0.02]" : ""}
+                ${!isToday && isFuture && dayTasks.length > 0 ? "bg-white/2" : ""}
               `}
                         >
                             <span className={`text-xl font-black tracking-tighter ${isToday ? "text-white" : "text-slate-200"}`}>{d.day}</span>
@@ -105,42 +105,49 @@ const Calendar = ({ schedule, selectedDay, onSelectDay }) => {
                             )}
 
                             {/* Hover Tooltip — Native App Style */}
-                            {dayTasks.length > 0 && !d.inactive && (
-                                <div className="absolute bottom-full mb-6 left-1/2 -translate-x-1/2 w-64 p-5 bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 shadow-4xl translate-y-2 group-hover:translate-y-0">
-                                    <div className="flex justify-between items-center mb-4 pb-3 border-b border-white/10">
-                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">GÜNLÜK ÖZET</span>
-                                        <span className="text-[10px] font-black text-duo-blue">{completedCount}/{dayTasks.length}</span>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {dayTasks.slice(0, 5).map((t, ti) => (
-                                            <div key={ti} className="flex flex-col gap-0.5 border-l-2 border-duo-blue/30 pl-3">
-                                                <div
-                                                    className={`text-[11px] font-black truncate leading-tight uppercase ${t.completed
-                                                        ? "text-duo-green/60 line-through"
-                                                        : "text-white"
-                                                        }`}
-                                                >
-                                                    {t.topic || "GENEL ÇALIŞMA"}
+                            {dayTasks.length > 0 && !d.inactive && (() => {
+                                const verticalClass = i < 14 ? "top-full mt-6" : "bottom-full mb-6";
+                                let horizontalClass = "left-1/2 -translate-x-1/2";
+                                if (i % 7 < 2) horizontalClass = "left-0 translate-x-0";
+                                else if (i % 7 > 4) horizontalClass = "right-0 translate-x-0 left-auto";
+
+                                return (
+                                    <div className={`absolute ${verticalClass} ${horizontalClass} w-64 p-5 bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-100 shadow-4xl translate-y-2 group-hover:translate-y-0`}>
+                                        <div className="flex justify-between items-center mb-4 pb-3 border-b border-white/10">
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">GÜNLÜK ÖZET</span>
+                                            <span className="text-[10px] font-black text-duo-blue">{completedCount}/{dayTasks.length}</span>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {dayTasks.slice(0, 5).map((t, ti) => (
+                                                <div key={ti} className="flex flex-col gap-0.5 border-l-2 border-duo-blue/30 pl-3">
+                                                    <div
+                                                        className={`text-[11px] font-black truncate leading-tight uppercase ${t.completed
+                                                            ? "text-duo-green/60 line-through"
+                                                            : "text-white"
+                                                            }`}
+                                                    >
+                                                        {t.topic || "GENEL ÇALIŞMA"}
+                                                    </div>
+                                                    <div className="text-[9px] font-bold text-slate-500 truncate tracking-tighter uppercase">
+                                                        {t.title}
+                                                    </div>
                                                 </div>
-                                                <div className="text-[9px] font-bold text-slate-500 truncate tracking-tighter uppercase">
-                                                    {t.title}
+                                            ))}
+                                            {dayTasks.length > 5 && (
+                                                <div className="text-[9px] text-slate-600 font-bold italic pt-1 pl-3">
+                                                    + {dayTasks.length - 5} ders daha
                                                 </div>
-                                            </div>
-                                        ))}
-                                        {dayTasks.length > 5 && (
-                                            <div className="text-[9px] text-slate-600 font-bold italic pt-1 pl-3">
-                                                + {dayTasks.length - 5} ders daha
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
+                                        <div className="mt-5 pt-4 border-t border-white/10 flex justify-between items-center">
+                                            <span className="text-[10px] font-black text-duo-orange uppercase">TOPLAM SORU</span>
+                                            <span className="text-lg font-black text-white tracking-tighter">
+                                                {totalQ}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="mt-5 pt-4 border-t border-white/10 flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-duo-orange uppercase">TOPLAM SORU</span>
-                                        <span className="text-lg font-black text-white tracking-tighter">
-                                            {totalQ}
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
+                                );
+                            })()}
                         </div>
                     );
                 })}

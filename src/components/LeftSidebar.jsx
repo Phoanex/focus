@@ -18,14 +18,22 @@ const LeftSidebar = ({ stats }) => {
                 </div>
 
                 {/* Başarı Oranı Kartı */}
-                <div className="success-card rounded-2xl p-6 shadow-xl flex items-center gap-5 relative overflow-hidden group border border-white/10 text-white">
-                    <div className="text-4xl drop-shadow-2xl z-10 transition-transform group-hover:scale-110 duration-500">🎯</div>
+                <div className="bg-slate-900/40 rounded-2xl p-6 shadow-xl flex items-center gap-5 relative overflow-hidden group border border-white/10 text-white">
+                    <div className="relative w-10 h-10 flex items-center justify-center z-10 shrink-0 transition-transform group-hover:scale-110 duration-500">
+                        <div className="absolute inset-0"></div>
+                        <svg viewBox="0 0 24 24" className="w-9 h-9 relative z-10 drop-shadow-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="9" stroke="#3b82f6" strokeWidth="2.5" opacity="0.3" />
+                            <circle cx="12" cy="12" r="5" stroke="#3b82f6" strokeWidth="2.5" />
+                            <circle cx="12" cy="12" r="1.5" fill="white" />
+                            <path d="M12 2V5M12 19V22M2 12H5M19 12H22" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+                        </svg>
+                    </div>
                     <div className="z-10">
                         <div className="text-4xl font-black leading-none tracking-tighter">
                             %{stats.avgRate}
                         </div>
                         <div className="text-[9px] font-black uppercase tracking-[0.4em] opacity-80 mt-1">
-                            BAŞARI ORANI
+                            TAMAMALAMA ORANI
                         </div>
                     </div>
                 </div>
@@ -42,7 +50,7 @@ const LeftSidebar = ({ stats }) => {
                         stats.exams.map((e, i) => (
                             <div
                                 key={i}
-                                className="group flex items-center justify-between p-3 rounded-xl hover:bg-white/[0.03] transition-all cursor-default"
+                                className="group flex items-center justify-between p-3 rounded-xl hover:bg-white/3 transition-all cursor-default"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-1 h-1 rounded-full bg-duo-purple/40 group-hover:bg-duo-purple transition-all"></div>
