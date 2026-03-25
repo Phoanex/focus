@@ -38,6 +38,9 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/build/target
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          NO_STRIP: 1
         with:
           tagName: v__VERSION__ # tauri-action automatically replaces this
           releaseName: "Focus v__VERSION__"
