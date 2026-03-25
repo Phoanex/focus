@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+# Yazma izni ekle (Release oluşturabilmek için)
+permissions:
+  contents: write
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -40,7 +44,6 @@ jobs:
           releaseBody: "Focus uygulamasının yeni sürümü."
           releaseDraft: true
           prerelease: false
-          args: --verbose
 
       - name: Upload Build Artifacts for Arch
         uses: actions/upload-artifact@v4
