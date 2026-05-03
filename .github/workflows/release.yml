@@ -27,11 +27,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
+            build-essential \
+            libssl-dev \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-            libfuse2
+            libfuse2 \
+            file \
+            patchelf
 
       - name: Install frontend dependencies
         run: npm install
@@ -55,8 +59,8 @@ jobs:
           prerelease: false
           args: --bundles deb,appimage
 
-      # Arch build için artifact aktar
-      - name: Upload Build Artifacts for Arch
+      # deb ve appimage artifact'larını aktar
+      - name: Upload Build Artifacts for Linux
         uses: actions/upload-artifact@v4
         with:
           name: tauri-build-output
@@ -64,6 +68,17 @@ jobs:
             build/target/release/focus-app
             build/target/release/bundle/deb/*.deb
           retention-days: 1
+
+      - name: Upload Linux Packages to Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build/target/release/bundle/deb/*.deb
+            build/target/release/bundle/appimage/*.AppImage
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-arch:
     needs: build-linux
