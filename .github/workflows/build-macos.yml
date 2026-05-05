@@ -34,17 +34,13 @@ jobs:
         run: npm run build
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: --target universal-apple-darwin
+        run: npm run tauri build -- --target universal-apple-darwin
 
       - name: Find DMG files
-        run: find /Users/runner/work -name "*.dmg" 2>/dev/null || echo "No DMG found"
+        run: find . -name "*.dmg" 2>/dev/null || echo "No DMG found"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-dmg
-          path: /Users/runner/work/focus/focus/src-tauri/target/universal-apple-darwin/release/bundle/dmg/Focus_1.3.5_universal.dmg
+          path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
