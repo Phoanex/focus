@@ -3,7 +3,7 @@ name: Build macOS DMG
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # Manuel tetikleme için
+  workflow_dispatch:
 
 jobs:
   build-macos:
@@ -17,10 +17,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: 'npm'  # yarn veya pnpm kullanıyorsan değiştir
+          cache: 'npm'
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Add Rust targets
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -38,7 +43,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --target universal-apple-darwin  # Intel + Apple Silicon (evrensel)
+          args: --target universal-apple-darwin
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
