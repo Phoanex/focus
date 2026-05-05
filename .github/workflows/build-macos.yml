@@ -34,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Build Tauri app
-        run: npm run tauri build -- --target universal-apple-darwin
+        run: npm run tauri build -- --target universal-apple-darwin --bundles dmg
 
       - name: Find DMG files
         run: find . -name "*.dmg" 2>/dev/null || echo "No DMG found"
